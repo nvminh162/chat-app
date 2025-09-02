@@ -1,22 +1,45 @@
+import React from "react";
 import { Row, Col, Button, Typography } from "antd";
-const { Title } = Typography;
+import { auth } from "../../firebase/config";
+import { addDocument, generateKeywords } from "../../firebase/services";
 
-// import from firebase
-import { app } from "../../firebase/config";
+// import provider và hàm từ Firebase v9
 import {
-  getAuth,
-  signInWithPopup,
   GoogleAuthProvider,
   FacebookAuthProvider,
+  signInWithPopup,
+  getAdditionalUserInfo,
 } from "firebase/auth";
 
-const auth = getAuth(app);
-const facebookProvider = new FacebookAuthProvider();
+const { Title } = Typography;
+
 const googleProvider = new GoogleAuthProvider();
+const fbProvider = new FacebookAuthProvider();
 
 export default function Login() {
   const handleLogin = async (provider) => {
-    await signInWithPopup(auth, provider);
+    try {
+      const userCredential = await signInWithPopup(auth, provider);
+
+      // Lấy thêm thông tin user mới
+      const additionalUserInfo = getAdditionalUserInfo(userCredential);
+      const { user } = userCredential;
+
+      if (additionalUserInfo?.isNewUser) {
+        await addDocument("users", {
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          uid: user.uid,
+          providerId: additionalUserInfo.providerId,
+          keywords: generateKeywords(user.displayName?.toLowerCase()),
+        });
+      }
+
+      console.log("✅ Login successful:", user.displayName);
+    } catch (error) {
+      console.error("❌ Error during login: ", error);
+    }
   };
 
   return (
@@ -34,7 +57,7 @@ export default function Login() {
           </Button>
           <Button
             style={{ width: "100%" }}
-            onClick={() => handleLogin(facebookProvider)}
+            onClick={() => handleLogin(fbProvider)}
           >
             Đăng nhập bằng Facebook
           </Button>
