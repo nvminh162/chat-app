@@ -3,8 +3,8 @@ import ChatRoom from './components/ChatRoom';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import AuthProvider from './context/AuthProvider';
 import AppProvider from './context/AppProvider';
-// import AddRoomModal from './components/Modals/AddRoomModal';
-// import InviteMemberModal from './components/Modals/InviteMemberModal';
+import AddRoomModal from './components/Modals/AddRoomModal';
+import InviteMemberModal from './components/Modals/InviteMemberModal';
 
 function App() {
   return (
@@ -18,8 +18,8 @@ function App() {
           </Routes>
 
           {/* Modal vẫn để ngoài Routes */}
-          {/* <AddRoomModal />
-          <InviteMemberModal /> */}
+          <AddRoomModal />
+          <InviteMemberModal />
         </AppProvider>
       </AuthProvider>
     </BrowserRouter>

@@ -4,7 +4,11 @@ import { db } from './config';
 import {
   collection,
   addDoc,
-  serverTimestamp
+  serverTimestamp,
+  doc,
+  updateDoc,
+  getDocs,
+  query
 } from "firebase/firestore";
 
 // Thêm document vào Firestore
@@ -66,4 +70,47 @@ export const generateKeywords = (displayName) => {
   }, []);
 
   return keywords;
+};
+
+// Update keywords cho user hiện có
+export const updateUserKeywords = async (uid, displayName) => {
+  try {
+    const userRef = doc(db, 'users', uid);
+    const keywords = generateKeywords(displayName.toLowerCase());
+    
+    await updateDoc(userRef, {
+      keywords: keywords
+    });
+    
+    console.log('Updated keywords for user:', uid);
+  } catch (error) {
+    console.error('Error updating user keywords:', error);
+  }
+};
+
+// Update keywords cho tất cả users
+export const updateAllUsersKeywords = async () => {
+  try {
+    const usersRef = collection(db, 'users');
+    const snapshot = await getDocs(usersRef);
+    
+    const updatePromises = snapshot.docs.map(async (docSnapshot) => {
+      const userData = docSnapshot.data();
+      const uid = docSnapshot.id;
+      
+      if (!userData.keywords && userData.displayName) {
+        const keywords = generateKeywords(userData.displayName.toLowerCase());
+        const userRef = doc(db, 'users', uid);
+        
+        return updateDoc(userRef, {
+          keywords: keywords
+        });
+      }
+    });
+    
+    await Promise.all(updatePromises);
+    console.log('Updated keywords for all users');
+  } catch (error) {
+    console.error('Error updating all users keywords:', error);
+  }
 };

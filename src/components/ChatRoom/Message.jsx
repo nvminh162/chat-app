@@ -1,6 +1,6 @@
 import { Avatar, Typography } from "antd";
 import styled from "styled-components";
-import { formatRelative } from "date-fns/esm";
+import { formatRelative } from "date-fns";
 
 const WrapperStyled = styled.div`
   margin-bottom: 10px;

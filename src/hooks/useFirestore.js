@@ -32,11 +32,11 @@ const useFirestore = (collectionName, condition) => {
       q = query(
         collectionRef,
         where(condition.fieldName, condition.operator, condition.compareValue),
-        orderBy("createAt")
+        orderBy("createdAt")
       );
     } else {
       // nếu không có điều kiện thì chỉ orderBy
-      q = query(collectionRef, orderBy("createAt"));
+      q = query(collectionRef, orderBy("createdAt"));
     }
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
